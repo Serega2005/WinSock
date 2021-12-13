@@ -6,7 +6,6 @@
 #include<iostream>
 #include<WinSock2.h>
 #include<iphlpapi.h>
-#include<ctype.h>
 
 using namespace std;
 
