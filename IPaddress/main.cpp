@@ -1,4 +1,4 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
+п»ї#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #ifdef UNICODE
 #undef UNICODE
 #endif
@@ -15,37 +15,37 @@ using namespace std;
 void main()
 {
 	setlocale(LC_ALL, "Russian");
-	//1) Инициализация WinSock:
+	//1) РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ WinSock:
 	WSADATA wsaData;
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	//MAKEWORD(2,2) задаёт желаемую версию WinSock - 2.2
+	//MAKEWORD(2,2) Р·Р°РґР°С‘С‚ Р¶РµР»Р°РµРјСѓСЋ РІРµСЂСЃРёСЋ WinSock - 2.2
 	if (iResult != 0)
 	{
-		cout << "Инициализация не удалась" << endl;
+		cout << "РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РЅРµ СѓРґР°Р»Р°СЃСЊ" << endl;
 		return;
 	}
 
 	///////////////////////////////////////////////////////////
 	
-	//Определим IP-адреса интерфейсов:
+	//РћРїСЂРµРґРµР»РёРј IP-Р°РґСЂРµСЃР° РёРЅС‚РµСЂС„РµР№СЃРѕРІ:
 	ULONG outBufLen = sizeof(IP_ADAPTER_ADDRESSES);
-	PIP_ADAPTER_ADDRESSES pAddress = (IP_ADAPTER_ADDRESSES*)HeapAlloc(GetProcessHeap(), 0, outBufLen);//Выделяет память, как оператор view
-	//IP_ADAPTER_ADDRESS - это список интерфейсов в системесо  всеми изх свойствами.
+	PIP_ADAPTER_ADDRESSES pAddress = (IP_ADAPTER_ADDRESSES*)HeapAlloc(GetProcessHeap(), 0, outBufLen);//Р’С‹РґРµР»СЏРµС‚ РїР°РјСЏС‚СЊ, РєР°Рє РѕРїРµСЂР°С‚РѕСЂ view
+	//IP_ADAPTER_ADDRESS - СЌС‚Рѕ СЃРїРёСЃРѕРє РёРЅС‚РµСЂС„РµР№СЃРѕРІ РІ СЃРёСЃС‚РµРјРµСЃРѕ  РІСЃРµРјРё РёР·С… СЃРІРѕР№СЃС‚РІР°РјРё.
 	
-	//получаем список интерфейсов:
-	//Первый вызов GetAdapterAddress нужен для определения размера буфера outBufLen
+	//РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РёРЅС‚РµСЂС„РµР№СЃРѕРІ:
+	//РџРµСЂРІС‹Р№ РІС‹Р·РѕРІ GetAdapterAddress РЅСѓР¶РµРЅ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° outBufLen
 	if (GetAdaptersAddresses(AF_INET, NULL, NULL, pAddress, &outBufLen) == ERROR_BUFFER_OVERFLOW)
 	{
-		HeapFree(GetProcessHeap(), 0, pAddress);//И для последующего выделения памяти
+		HeapFree(GetProcessHeap(), 0, pAddress);//Р РґР»СЏ РїРѕСЃР»РµРґСѓСЋС‰РµРіРѕ РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё
 		pAddress = (IP_ADAPTER_ADDRESSES*)HeapAlloc(GetProcessHeap(), 0, outBufLen);
 	}
 	if (pAddress == NULL)
 	{
-		cout << "память не выделена" << endl;
+		cout << "РїР°РјСЏС‚СЊ РЅРµ РІС‹РґРµР»РµРЅР°" << endl;
 		return;
 	}
 
-	//Вторй вызов GetAdapterAddress() уже заполняет структуру pAddress всеми данными об интерфейсах.
+	//Р’С‚РѕСЂР№ РІС‹Р·РѕРІ GetAdapterAddress() СѓР¶Рµ Р·Р°РїРѕР»РЅСЏРµС‚ СЃС‚СЂСѓРєС‚СѓСЂСѓ pAddress РІСЃРµРјРё РґР°РЅРЅС‹РјРё РѕР± РёРЅС‚РµСЂС„РµР№СЃР°С….
 	DWORD dwRetVal = GetAdaptersAddresses(AF_INET, NULL, NULL, pAddress, &outBufLen);
 	
 	if (dwRetVal == NO_ERROR)
@@ -56,16 +56,16 @@ void main()
 			cout << "Interface name:\t" << pCurAddress->AdapterName << endl;
 			wcout << "Description:\t" << pCurAddress->Description << endl;
 
-			DWORD dwAddressStringLength = 256; //Размер строки, содержашей IP-адрес
+			DWORD dwAddressStringLength = 256; //Р Р°Р·РјРµСЂ СЃС‚СЂРѕРєРё, СЃРѕРґРµСЂР¶Р°С€РµР№ IP-Р°РґСЂРµСЃ
 			
-			//Проход по списку Unicast-адресов текущего адаптера (pCurAddress):
+			//РџСЂРѕС…РѕРґ РїРѕ СЃРїРёСЃРєСѓ Unicast-Р°РґСЂРµСЃРѕРІ С‚РµРєСѓС‰РµРіРѕ Р°РґР°РїС‚РµСЂР° (pCurAddress):
 			for (PIP_ADAPTER_UNICAST_ADDRESS_LH pUnicast = pCurAddress->FirstUnicastAddress; pUnicast; pUnicast = pUnicast->Next)
 			{
-				//Выделяем память для строки, которой будет хранится полученный IP-адрес.
+				//Р’С‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ РґР»СЏ СЃС‚СЂРѕРєРё, РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЃСЏ РїРѕР»СѓС‡РµРЅРЅС‹Р№ IP-Р°РґСЂРµСЃ.
 				LPSTR lpszAddressString = (LPSTR)HeapAlloc(GetProcessHeap(), 0, dwAddressStringLength);
-				//Представляем адрес в точечно-десятичной нотации:
+				//РџСЂРµРґСЃС‚Р°РІР»СЏРµРј Р°РґСЂРµСЃ РІ С‚РѕС‡РµС‡РЅРѕ-РґРµСЃСЏС‚РёС‡РЅРѕР№ РЅРѕС‚Р°С†РёРё:
 				WSAAddressToString(pUnicast->Address.lpSockaddr, pUnicast->Address.iSockaddrLength, NULL, lpszAddressString, &dwAddressStringLength);
-				//буква W в имени функции, или типа данных означает WIDE_CHAR(w_char_t) - символы в кодировке Unicode
+				//Р±СѓРєРІР° W РІ РёРјРµРЅРё С„СѓРЅРєС†РёРё, РёР»Рё С‚РёРїР° РґР°РЅРЅС‹С… РѕР·РЅР°С‡Р°РµС‚ WIDE_CHAR(w_char_t) - СЃРёРјРІРѕР»С‹ РІ РєРѕРґРёСЂРѕРІРєРµ Unicode
 				
 				/*cout << "\tIP address:\t" << lpszAddressString << endl;
 				wcout << "/" << pUnicast->OnLinkPrefixLength << endl;*/
@@ -86,8 +86,8 @@ void main()
 				cout << "Phisical address (MAC): ";
 				for (int i = 0; i < pCurAddress->PhysicalAddressLength; i++)
 				{
-					cout.width(2); //Задаёт ширину поля для вывода
-					cout.fill('0');//Заполняет пустое место в выделенном поля заддным символом
+					cout.width(2); //Р—Р°РґР°С‘С‚ С€РёСЂРёРЅСѓ РїРѕР»СЏ РґР»СЏ РІС‹РІРѕРґР°
+					cout.fill('0');//Р—Р°РїРѕР»РЅСЏРµС‚ РїСѓСЃС‚РѕРµ РјРµСЃС‚Рѕ РІ РІС‹РґРµР»РµРЅРЅРѕРј РїРѕР»СЏ Р·Р°РґРґРЅС‹Рј СЃРёРјРІРѕР»РѕРј
 					cout << (hex) << (int)pCurAddress->PhysicalAddress[i];
 					if(i!=pCurAddress->PhysicalAddressLength-1)cout << "-";
 				}
@@ -99,6 +99,6 @@ void main()
 
 	HeapFree(GetProcessHeap(), 0, pAddress);
 
-	//Удаляем сокет:
+	//РЈРґР°Р»СЏРµРј СЃРѕРєРµС‚:
 	WSACleanup();
 }
