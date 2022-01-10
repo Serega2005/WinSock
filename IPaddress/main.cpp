@@ -71,12 +71,18 @@ void main()
 				wcout << "/" << pUnicast->OnLinkPrefixLength << endl;*/
 				printf("\tIP address:\t%s /%d\n", lpszAddressString, pUnicast->OnLinkPrefixLength);
 				//%s - string
-				//TODO:
-				/*ULONG lMask = 0;
-				if (ConvertLengthToIpv4Mask(pUnicast->OnLinkPrefixLength, &lMask) == NO_ERROR)
+				//TODO
+				ULONG lMask = 0;
+				union
 				{
-					cout << "\tSubnet mask: " << lMask << endl;
-				}*/
+					ULONG ul;
+					BYTE b[4];
+				}mask;
+				if (ConvertLengthToIpv4Mask(pUnicast->OnLinkPrefixLength, &mask.ul) == NO_ERROR)
+				{
+					//cout << "\tSubnet mask: " << mask.b[0] << mask.b<< endl;
+					printf("\tSubnet mask:\t %u.%u.%u.%u\n", mask.b[0], mask.b[1], mask.b[2], mask.b[3]);
+				}
 
 				HeapFree(GetProcessHeap(), 0, lpszAddressString);
 			}
@@ -86,10 +92,13 @@ void main()
 				cout << "Phisical address (MAC): ";
 				for (int i = 0; i < pCurAddress->PhysicalAddressLength; i++)
 				{
-					cout.width(2); //Задаёт ширину поля для вывода
-					cout.fill('0');//Заполняет пустое место в выделенном поля заддным символом
-					cout << (hex) << (int)pCurAddress->PhysicalAddress[i];
-					if(i!=pCurAddress->PhysicalAddressLength-1)cout << "-";
+					//cout.width(2); //Задаёт ширину поля для вывода
+					//cout.fill('0');//Заполняет пустое место в выделенном поля заддным символом
+					//cout << (hex) << (int)pCurAddress->PhysicalAddress[i];
+					//if(i!=pCurAddress->PhysicalAddressLength-1)cout << "-";
+
+					printf("%2.X", pCurAddress->PhysicalAddress[i]);
+					if (i != pCurAddress->PhysicalAddressLength - 1)printf(":");
 				}
 			}
 
