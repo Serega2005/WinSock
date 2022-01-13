@@ -75,7 +75,7 @@ extern void init_ping_packet(ICMPHeader* icmp_hdr, int packet_size, int seq_no)
 	while (bytes_left)
 	{
 		memcpy(deadpart, &dead, min(sizeof(dead), bytes_left));
-		bytes_left -= dead;
+		bytes_left -= sizeof(dead);
 		deadpart += sizeof(dead);
 	}
 	icmp_hdr->checksum = ip_checksum((USHORT*)icmp_hdr, packet_size);
@@ -118,5 +118,55 @@ extern int recv_ping(SOCKET sd, sockaddr_in& source, IPHeader* recv_buf, int pac
 		else cerr << " error #" << last_error << endl;
 		return -1;
 	}
+	return 0;
+}
+
+extern int decore_reply(IPHeader* reply, int bytes, sockaddr_in* from)
+{
+	using namespace std;
+	unsigned short header_lin = reply->h_len * 4;
+	ICMPHeader* icmphdr = (ICMPHeader*)((char*)reply + header_lin);
+	//При помощи арифметики указателей переходим с начала IP-загаловка
+
+	if (bytes < header_lin + ICMP_MIN)
+	{
+		cerr << "too few bytes from " << inet_ntoa(from->sin_addr) << endl;
+		return -1;
+	}
+	else if (icmphdr->type != ICMP_ECHO_REPLY)
+	{
+		if (icmphdr->type != ICMP_TTL_EXPIRE)
+		{
+			if (icmphdr->type == ICMP_DEST_UNREACH)
+			{
+				cerr << "Destination unreachable" << endl;
+			}
+			else
+			{
+				cerr << "Unknow ICMP-packet type" << (int)icmphdr->type << endl;
+			}
+			return -1;
+		}
+	}
+	else if (icmphdr->id != (USHORT)GetCurrentProcessId())
+	{
+		return -2;
+	}
+
+	int nHops = 256 - reply->ttl;
+	if (nHops == 192)nHops = 1;
+	else if (nHops == 128)nHops = 0;
+
+	cout << bytes << " bytes form "<<inet_ntoa(from->sin_addr)  << ", icmp_seq " << icmphdr->seq << ", ";
+	if (icmphdr->type = ICMP_TTL_EXPIRE)
+	{
+		cout << "TTL expired." << endl;
+	}
+	else
+	{
+		cout << nHops << " hops";
+		cout << ", time: " << (GetTickCount() - icmphdr->timestamp) << " ms.";
+	}
+
 	return 0;
 }
