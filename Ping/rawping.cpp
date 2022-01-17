@@ -72,7 +72,7 @@ extern void init_ping_packet(ICMPHeader* icmp_hdr, int packet_size, int seq_no)
 	const unsigned int dead = 0xDEADBEEF;
 	char* deadpart = (char*)icmp_hdr + sizeof(ICMPHeader);
 	int bytes_left = packet_size - sizeof(ICMPHeader);
-	while (bytes_left)
+	while (bytes_left>=0)
 	{
 		memcpy(deadpart, &dead, min(sizeof(dead), bytes_left));
 		bytes_left -= sizeof(dead);
@@ -80,7 +80,7 @@ extern void init_ping_packet(ICMPHeader* icmp_hdr, int packet_size, int seq_no)
 	}
 	icmp_hdr->checksum = ip_checksum((USHORT*)icmp_hdr, packet_size);
 }
-
+ 
 extern int send_ping(SOCKET sd, const sockaddr_in& dest, ICMPHeader* send_buf, int packet_size)
 {
 	using namespace std;
@@ -158,7 +158,7 @@ extern int decore_reply(IPHeader* reply, int bytes, sockaddr_in* from)
 	else if (nHops == 128)nHops = 0;
 
 	cout << bytes << " bytes form "<<inet_ntoa(from->sin_addr)  << ", icmp_seq " << icmphdr->seq << ", ";
-	if (icmphdr->type = ICMP_TTL_EXPIRE)
+	if (icmphdr->type == ICMP_TTL_EXPIRE)
 	{
 		cout << "TTL expired." << endl;
 	}

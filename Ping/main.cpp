@@ -76,8 +76,8 @@ int main(int argc, char* argv[])
 				{
 					break;
 				}
-				if (decore_reply(recv_buf, packet_size, &src) != -2)break;
 			}
+			if (decore_reply(recv_buf, packet_size, &src) != -2)break;
 		}
 	}
 }
