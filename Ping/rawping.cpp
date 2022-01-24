@@ -4,11 +4,11 @@
 #include<iostream>
 
 #include"rawping.h"
-#include"ip_checksum.h"
 
 extern int setup_for_ping(char* host, int ttl, SOCKET& sd, sockaddr_in& dest)
 {
 	using namespace std;
+	setlocale(LC_ALL, "");
 	//Create socket:
 	sd = WSASocket(AF_INET, SOCK_RAW, IPPROTO_ICMP, 0, 0, 0);
 	//AF_INET - семейство протоколов IPv4
@@ -153,7 +153,7 @@ extern int decore_reply(IPHeader* reply, int bytes, sockaddr_in* from)
 		return -2;
 	}
 
-	int nHops = 256 - reply->ttl;
+	int nHops = 128 - reply->ttl;
 	if (nHops == 192)nHops = 1;
 	else if (nHops == 128)nHops = 0;
 
@@ -165,7 +165,7 @@ extern int decore_reply(IPHeader* reply, int bytes, sockaddr_in* from)
 	else
 	{
 		cout << nHops << " hops";
-		cout << ", time: " << (GetTickCount() - icmphdr->timestamp) << " ms.";
+		cout << ", time: " << (GetTickCount() - icmphdr->timestamp) << " ms.\n";
 	}
 
 	return 0;

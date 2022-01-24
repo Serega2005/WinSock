@@ -1,6 +1,7 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
 #include<WinSock2.h>
+#include"ip_checksum.h"
 
 //ICMP packet types
 #define ICMP_ECHO_REQUEST	8
@@ -17,7 +18,7 @@
 struct IPHeader
 {
 	BYTE h_len : 4;		//IP-header length 20 Byte
-	BYTE version;		//IPv4
+	BYTE version : 4;		//IPv4
 	BYTE tos;			//Type of service
 	USHORT total_len;	//Общая длина IP-пакета включая заголовок и поле данных
 	USHORT ident;
