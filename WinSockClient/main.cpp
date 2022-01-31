@@ -24,6 +24,10 @@ int main(int argc, char* argv[])
 		printf("WSAStartup failed: %d\n", iResult);
 		return 1;
 	}
+	else
+	{
+		printf("WinSock initialised\n");
+	}
 
 	//////////////////////////////////////////////
 	// 2.Создание сокета для клиента:
@@ -57,6 +61,10 @@ int main(int argc, char* argv[])
 		WSACleanup();
 		return 1;
 	}
+	else
+	{
+		printf("Socket created\n");
+	}
 
 	///////////////////////////////////////////////
 	// 3.Подключение к серверу:
@@ -76,13 +84,18 @@ int main(int argc, char* argv[])
 		WSACleanup();
 		return 1;
 	}
+	else
+	{
+		printf("Connection opened\n");
+	}
 
 	///////////////////////////////////////////////
 	// 4.Обмен данными с сервером:
 	///////////////////////////////////////////////
 
 	int recvbuflen = DEFAULT_BUFLEN; //размер буфера получения
-	const char* sendbuf = "this is a test";
+	//const char* sendbuf = "this is a test";
+	const char* sendbuf = argv[2];
 	char recvbuf[DEFAULT_BUFLEN]{};
 
 	iResult = send(ConnectSocket, sendbuf, strlen(sendbuf), 0);
