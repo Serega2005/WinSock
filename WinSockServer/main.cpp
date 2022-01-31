@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 //#ifndef WIN32_LEAN_AND_MEAN
 //#define WIN32_LEAN_AND_MEAN
 //#endif // WIN32_LIN_AND_MEAN
@@ -12,6 +13,7 @@ using namespace std;
 
 #pragma comment(lib, "Ws2_32.lib")
 #define DEFAULT_PORT "27015"
+#define DEFAULT_BUFLEN 512
 
 
 int main(int argc, char* argv[])
@@ -89,7 +91,78 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	///////////////////////////////////////////////////
+	// 5.Прием соединений от клиентов:
+	////////////////////////////////////////////////////
 
+	SOCKET ClientSocket = INVALID_SOCKET;
+	iResult = accept(ListenSocket, NULL, NULL);
+	if (ClientSocket == INVALID_SOCKET)
+	{
+		printf("accept failed: %d", WSAGetLastError());
+		closesocket(ListenSocket);
+		WSACleanup();
+		return 1;
+	}
+
+	///////////////////////////////////////////////////
+	// 6.Получение и отправка данных:
+	///////////////////////////////////////////////////
+
+	char recvbuffer[DEFAULT_BUFLEN]{};
+	int iSendResult = 0;
+	int recvBufLen = DEFAULT_BUFLEN;
+	do
+	{
+		iResult = recv(ClientSocket, recvbuffer, recvBufLen, 0);
+		if (iResult > 0)
+		{
+			printf("%d Bytes received\n", iResult);
+			printf("%s\n", recvbuffer);
+			strcat(recvbuffer, " received");
+
+			//отправляем полученный буффер обратно клиенту:
+			iSendResult = send(ClientSocket, recvbuffer, iResult, 0);
+			if (iSendResult == SOCKET_ERROR)
+			{
+				printf("send failed: %d", WSAGetLastError());
+				closesocket(ListenSocket);
+				WSACleanup();
+				return 1;
+			}
+			printf("%d Bytes sent.\n", iSendResult);
+		}
+		else if (iResult==0)
+		{
+			printf("Connection closing...\n");
+		}
+		else
+		{
+			printf("recv failed: %d\n", WSAGetLastError());
+			closesocket(ClientSocket);
+			WSACleanup();
+			return 1;
+		}
+	} while (iResult>0);
+
+	///////////////////////////////////////////////////
+	// 7. Отключение сервера:
+	///////////////////////////////////////////////////
+
+	iResult = shutdown(ClientSocket, SD_SEND);
+	if (iResult == SOCKET_ERROR)
+	{
+		printf("shutdown failed: %d\n", WSAGetLastError());
+		closesocket(ClientSocket);
+		WSACleanup ();
+		return 1;
+	}
+
+	closesocket(ClientSocket);
+
+
+
+	closesocket(ListenSocket);
 	WSACleanup();
 	return 0;
 }

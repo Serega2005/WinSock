@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 	///////////////////////////////////////////////
 
 	iResult = connect(ConnectSocket, ptr->ai_addr, ptr->ai_addrlen);
-	if (iResult = SOCKET_ERROR)
+	if (iResult == SOCKET_ERROR)
 	{
 		closesocket(ConnectSocket);
 		ConnectSocket = INVALID_SOCKET;
