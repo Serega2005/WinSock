@@ -31,7 +31,10 @@ int main(int argc, char* argv[])
 		printf("WSAStartup failed: %d\n", iResult);
 		return 1;
 	}
-
+	else
+	{
+		printf("winSock initialased\n");
+	}
 	//////////////////////////////////////////////
 	// 2.Создание сокета:
 	//////////////////////////////////////////////
@@ -62,6 +65,10 @@ int main(int argc, char* argv[])
 		WSACleanup();
 		return 1;
 	}
+	else
+	{
+		printf("Socket created\d");
+	}
 
 	///////////////////////////////////////////////////
 	// 3.привязка сокета к IP-адресу:
@@ -75,6 +82,10 @@ int main(int argc, char* argv[])
 		closesocket(ListenSocket);
 		WSACleanup();
 		return 1;
+	}
+	else
+	{
+		printf("Socket binded to interface\n");
 	}
 
 	///////////////////////////////////////////////////
@@ -90,19 +101,29 @@ int main(int argc, char* argv[])
 		WSACleanup();
 		return 1;
 	}
+	else
+	{
+		printf("Listening to port %s\n", DEFAULT_PORT);
+	}
 
 	///////////////////////////////////////////////////
 	// 5.Прием соединений от клиентов:
 	////////////////////////////////////////////////////
 
+	printf("Waiting for connections\n");
+
 	SOCKET ClientSocket = INVALID_SOCKET;
-	iResult = accept(ListenSocket, NULL, NULL);
+	ClientSocket = accept(ListenSocket, NULL, NULL);
 	if (ClientSocket == INVALID_SOCKET)
 	{
 		printf("accept failed: %d", WSAGetLastError());
 		closesocket(ListenSocket);
 		WSACleanup();
 		return 1;
+	}
+	else
+	{
+		printf("Accepting connections\n");
 	}
 
 	///////////////////////////////////////////////////
@@ -122,7 +143,7 @@ int main(int argc, char* argv[])
 			strcat(recvbuffer, " received");
 
 			//отправляем полученный буффер обратно клиенту:
-			iSendResult = send(ClientSocket, recvbuffer, iResult, 0);
+			iSendResult = send(ClientSocket, recvbuffer, strlen(recvbuffer), 0);
 			if (iSendResult == SOCKET_ERROR)
 			{
 				printf("send failed: %d", WSAGetLastError());
